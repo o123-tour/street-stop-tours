@@ -21,7 +21,7 @@ function Index() {
         <div className="absolute inset-0 hero-shade" />
         <div className="relative px-5 text-center">
           <StreetSign size="lg" className="animate-in fade-in zoom-in-95 duration-700" />
-          <p className="mt-8 font-display text-xl italic text-foreground/90 sm:text-2xl">History, told on the streets where it happened.</p>
+          <p className="mt-8 font-display text-xl italic text-foreground/90 sm:text-2xl">History, brought to life, on the streets it happened.</p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Link to="/book" className="rounded bg-primary px-6 py-3 font-sign text-sm font-semibold uppercase tracking-widest text-primary-foreground hover:bg-primary/90">Book a tour</Link>
             <a href="#tours" className="rounded border border-foreground/40 px-6 py-3 font-sign text-sm uppercase tracking-widest hover:border-primary hover:text-primary">Browse tours</a>
@@ -34,12 +34,13 @@ function Index() {
           <p className="eyebrow">About us</p>
           <h2 className="mt-3 text-4xl font-semibold">Every street has a story stop.</h2>
           <p className="mt-6 text-lg leading-relaxed text-muted-foreground">
-            Street Stop Tours runs 90-minute walking tours through the UK's most storied streets. We bring
-            history and literature to life right where it happened: in courtyards, alleys and squares that
-            most people walk straight past.
+            Street Stop Tours run 90-minute walking tours through the UK's most storied streets, led by
+            costumed guides to help bring history to life. Whether you're an expert on the period, or looking
+            to just dive into history, our tours offer something for everyone. We explore the past right where
+            it happened, in courtyards, alleys and squares that most people walk straight past.
           </p>
           <p className="mt-4 text-lg leading-relaxed text-muted-foreground">
-            Small groups, great stories, and a guide who knows every hidden corner.
+            Small groups, great stories and a guide who knows every hidden corner.
           </p>
         </div>
         <img src={images.mansion} alt="Street Stop guide leading a tour by Mansion House" className="aspect-[4/3] w-full rounded object-cover shadow-2xl" loading="lazy" />
