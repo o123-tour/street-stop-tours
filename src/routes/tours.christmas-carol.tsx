@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { PageHero } from "@/components/SiteHeader";
 import { images, tours } from "@/lib/content";
 
-const tour = tours[0];
+const tour = tours[0]!;
 
 export const Route = createFileRoute("/tours/christmas-carol")({
   head: () => ({

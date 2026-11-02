@@ -30,7 +30,7 @@ const field = "mt-2 w-full rounded border border-input bg-background px-4 py-3 t
 
 function Book() {
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const tour = tours[0];
+  const tour = tours[0]!;
 
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
