@@ -43,7 +43,7 @@ function Book() {
     const r = schema.safeParse(Object.fromEntries(new FormData(e.currentTarget)));
     const errs: Record<string, string> = {};
     if (!r.success) r.error.issues.forEach((i) => (errs[String(i.path[0])] = i.message));
-    if (!day || !time) errs.slot = "Please choose a date and time";
+    if (!day || !time) errs["slot"] = "Please choose a date and time";
     setErrors(errs);
     if (!r.success || !day || !time) return;
     const v = r.data;
@@ -91,11 +91,11 @@ function Book() {
               </div>
             </>
           )}
-          {errors.slot && <p className="mt-2 text-sm text-destructive">{errors.slot}</p>}
+          {errors["slot"] && <p className="mt-2 text-sm text-destructive">{errors["slot"]}</p>}
 
           <form onSubmit={onSubmit} className="mt-8 grid gap-5 sm:grid-cols-2" noValidate>
-            <label className="text-sm">Your name<input name="name" className={field} />{errors.name && <span className="mt-1 block text-destructive">{errors.name}</span>}</label>
-            <label className="text-sm">Email<input name="email" type="email" className={field} />{errors.email && <span className="mt-1 block text-destructive">{errors.email}</span>}</label>
+            <label className="text-sm">Your name<input name="name" className={field} />{errors["name"] && <span className="mt-1 block text-destructive">{errors["name"]}</span>}</label>
+            <label className="text-sm">Email<input name="email" type="email" className={field} />{errors["email"] && <span className="mt-1 block text-destructive">{errors["email"]}</span>}</label>
             <label className="text-sm">Number of guests
               <input type="number" min={1} max={20} value={guests} onChange={(e) => setGuests(Math.min(20, Math.max(1, Number(e.target.value) || 1)))} className={field} />
             </label>
