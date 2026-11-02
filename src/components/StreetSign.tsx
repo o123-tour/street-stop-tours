@@ -15,7 +15,7 @@ export function StreetSign({ size = "md", className }: { size?: "sm" | "md" | "l
         </div>
         <div className="my-1 h-px bg-sign-ink/30" />
         <div className={cn("font-semibold uppercase tracking-[0.35em] text-sign-red", s.sub)}>
-          Tours · EC
+          Tours
         </div>
       </div>
     </div>
