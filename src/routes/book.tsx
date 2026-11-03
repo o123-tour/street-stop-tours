@@ -5,7 +5,7 @@ import { PageHero } from "@/components/SiteHeader";
 import { images, tours } from "@/lib/content";
 import { formatTime, PRICE_PER_PERSON_GBP, totalPrice, tourDates } from "@/lib/schedule";
 
-const BOOKING_EMAIL = "hello@streetstoptours.co.uk";
+const BOOKING_EMAIL = "streetstoptours@gmail.com";
 
 const schema = z.object({
   name: z.string().trim().min(1, "Please enter your name").max(100),
