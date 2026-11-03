@@ -6,10 +6,40 @@
 // You can pass additional config via defineConfig({ vite: { ... }, etc... }) if needed.
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
+const basePath = process.env["VITE_BASE_PATH"] || "/";
+
 export default defineConfig({
+  vite: {
+    base: basePath,
+  },
+  nitro: {
+    output: {
+      dir: "dist",
+      publicDir: "dist/client",
+      serverDir: "dist/server",
+    },
+  },
   tanstackStart: {
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
     // nitro/vite builds from this
     server: { entry: "server" },
+    pages: [
+      { path: "/" },
+      { path: "/book" },
+      { path: "/tours/christmas-carol" },
+      { path: "/blog" },
+      { path: "/blog/history-of-st-pauls-cathedral" },
+    ],
+    prerender: {
+      enabled: true,
+      autoSubfolderIndex: true,
+    },
+    spa: {
+      enabled: true,
+      maskPath: "/?404",
+      prerender: {
+        outputPath: "/404",
+      },
+    },
   },
 });

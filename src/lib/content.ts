@@ -1,17 +1,17 @@
-import dome from "@/assets/St_Pauls_Dome.jpg.asset.json";
-import ghost from "@/assets/Ghostly_Figure.jpg.asset.json";
-import mansion from "@/assets/Guide_Mansion_House.jpg.asset.json";
-import stephen from "@/assets/Guide_Stephen_Row.jpg.asset.json";
-import carolGuide from "@/assets/carol_tour_guide.jpg.asset.json";
-import steps from "@/assets/st_pauls_steps.jpg.asset.json";
+import dome from "@/assets/St_Pauls_Dome.jpg";
+import ghost from "@/assets/Ghostly_Figure.jpg";
+import mansion from "@/assets/Guide_Mansion_House.jpg";
+import stephen from "@/assets/Guide_Stephen_Row.jpg";
+import carolGuide from "@/assets/carol_tour_guide.jpg";
+import steps from "@/assets/st_pauls_steps.jpg";
 
 export const images = {
-  dome: dome.url,
-  ghost: ghost.url,
-  mansion: mansion.url,
-  stephen: stephen.url,
-  carolGuide: carolGuide.url,
-  steps: steps.url,
+  dome,
+  ghost,
+  mansion,
+  stephen,
+  carolGuide,
+  steps,
 };
 
 export type Tour = {
@@ -37,7 +37,7 @@ export const tours: Tour[] = [
     start: "Paternoster Square Column",
     end: "Leadenhall Market",
     duration: "90 minutes",
-    image: carolGuide.url,
+    image: carolGuide,
     highlights: [
       "Paternoster Square Column",
       "Saint Paul's Churchyard",
@@ -84,7 +84,7 @@ export const posts: Post[] = [
     date: "2026-11-01",
     month: "November 2026",
     excerpt: "For over 1,400 years a cathedral dedicated to St Paul has stood on Ludgate Hill. Here is how London's great dome came to be.",
-    image: steps.url,
+    image: steps,
     body: [
       "The first cathedral to St Paul on Ludgate Hill was founded in 604 AD by Mellitus, Bishop of the East Saxons. It was built of wood and burned down, and its replacements met similar fates, until the Normans began a vast stone cathedral after a fire in 1087.",
       "That building, now known as Old St Paul's, grew into one of the longest churches in Europe, with a spire taller than anything in London today bar a few modern towers. By Tudor times its nave, nicknamed 'Paul's Walk', had become a noisy meeting place for gossips, merchants and pickpockets.",
