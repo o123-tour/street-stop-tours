@@ -5,7 +5,8 @@ import { PageHero } from "@/components/SiteHeader";
 import { images, tours } from "@/lib/content";
 import { formatTime, PRICE_PER_PERSON_GBP, totalPrice, tourDates } from "@/lib/schedule";
 
-const BOOKING_EMAIL = "streetstoptours@gmail.com";
+// Paste your deployed Google Apps Script Web App URL ("https://script.google.com/macros/s/.../exec") here:
+const GOOGLE_SCRIPT_URL = import.meta.env["VITE_GOOGLE_SCRIPT_URL"] || "";
 
 function makeReference() {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -67,27 +68,30 @@ function Book() {
     if (!r.success || !day || !time) return;
 
     const v = r.data;
+    const marketingOptIn = new FormData(form).get("marketing") === "on";
     const reference = makeReference();
     setSubmitting(true);
     try {
-      const response = await fetch(`https://formsubmit.co/ajax/${BOOKING_EMAIL}`, {
+      if (!GOOGLE_SCRIPT_URL) {
+        throw new Error("Google Script URL not configured");
+      }
+      const response = await fetch(GOOGLE_SCRIPT_URL, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
+          // Use text/plain so the browser sends a simple request without CORS preflight to Google Apps Script
+          "Content-Type": "text/plain;charset=utf-8",
         },
         body: JSON.stringify({
-          _subject: `Booking request (${reference}): ${tour.title} — ${day} Nov 2026 at ${formatTime(time)}`,
-          _template: "table",
-          _replyto: v.email,
-          Reference: reference,
-          Tour: tour.title,
-          Date: `${day} November 2026`,
-          Time: formatTime(time),
-          Guests: `${guests} (£${totalPrice(guests)})`,
-          Name: v.name,
-          Email: v.email,
-          Notes: v.notes || "None",
+          reference,
+          tour: tour.title,
+          date: `${day} November 2026`,
+          time: formatTime(time),
+          name: v.name,
+          email: v.email,
+          guests,
+          total: `£${totalPrice(guests)}`,
+          notes: v.notes || "",
+          marketingOptIn: marketingOptIn ? "Yes" : "No",
         }),
       });
       if (!response.ok) throw new Error("Failed to send booking request");
@@ -191,6 +195,10 @@ function Book() {
                 <div className="flex items-end text-lg">Total: <strong className="ml-2 text-primary">£{totalPrice(guests)}</strong></div>
                 <label className="text-sm sm:col-span-2">Anything we should know? (e.g. accessibility needs)
                   <textarea name="notes" rows={3} maxLength={1000} className={field} />
+                </label>
+                <label className="flex items-center gap-3 text-sm text-muted-foreground sm:col-span-2">
+                  <input type="checkbox" name="marketing" defaultChecked className="h-4 w-4 accent-primary" />
+                  <span>Keep me updated by email about future tours (including Sherlock Holmes &amp; Royal London).</span>
                 </label>
                 <p className="text-sm text-muted-foreground sm:col-span-2">Please arrive at Paternoster Square Column 10 minutes before your start time. The guide leaves promptly.</p>
                 {errors["submit"] && <p className="text-sm text-destructive sm:col-span-2">{errors["submit"]}</p>}
