@@ -30,6 +30,10 @@ export default defineConfig({
       { path: "/blog" },
       { path: "/blog/history-of-st-pauls-cathedral" },
     ],
+    sitemap: {
+      enabled: true,
+      host: "https://streetstoptours.com",
+    },
     prerender: {
       enabled: true,
       autoSubfolderIndex: true,
