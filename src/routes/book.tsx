@@ -5,8 +5,9 @@ import { PageHero } from "@/components/SiteHeader";
 import { images, tours } from "@/lib/content";
 import { formatTime, PRICE_PER_PERSON_GBP, totalPrice, tourDates } from "@/lib/schedule";
 
-// Paste your deployed Google Apps Script Web App URL ("https://script.google.com/macros/s/.../exec") here:
-const GOOGLE_SCRIPT_URL = import.meta.env["VITE_GOOGLE_SCRIPT_URL"] || "";
+const GOOGLE_SCRIPT_URL =
+  import.meta.env["VITE_GOOGLE_SCRIPT_URL"] ||
+  "https://script.google.com/macros/s/AKfycbwyyLjvqsDpTwFCApM-ZiUS5S029d6jfzzPY0yXvk6vSUa3rt457yAB4NAEw-gnXx7U1g/exec";
 
 function makeReference() {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
