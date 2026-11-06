@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
-import { isoFor, timesForDay } from "@/lib/schedule";
+import { canBook, isoFor, timesForDay } from "@/lib/schedule";
 import { canReview } from "@/lib/review-rules";
 
 const bookingSchema = z.object({
@@ -25,6 +25,9 @@ export const createBooking = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => bookingSchema.parse(d))
   .handler(async ({ data }) => {
     if (!timesForDay(data.month, data.day).includes(data.time)) throw new Error("That tour time isn't available.");
+    if (!canBook(data.month, data.day, data.time, new Date())) {
+      return { reference: null, error: "Booking enquiries close four hours before the tour starts. Please choose a later tour." };
+    }
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const reference = makeReference();
     const { error } = await supabaseAdmin.from("bookings").insert({
@@ -41,7 +44,7 @@ export const createBooking = createServerFn({ method: "POST" })
       console.error(error);
       throw new Error("Could not save your booking. Please try again.");
     }
-    return { reference };
+    return { reference, error: null };
   });
 
 const reviewSchema = z.object({

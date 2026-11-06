@@ -1,11 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { z } from "zod";
 import { useServerFn } from "@tanstack/react-start";
 import { createBooking } from "@/lib/bookings.functions";
 import { PageHero } from "@/components/SiteHeader";
 import { images, tours } from "@/lib/content";
-import { formatTime, PRICE_PER_PERSON_GBP, totalPrice, tourMonths } from "@/lib/schedule";
+import { canBook, formatTime, PRICE_PER_PERSON_GBP, totalPrice, tourMonths } from "@/lib/schedule";
 
 const GOOGLE_SCRIPT_URL =
   import.meta.env["VITE_GOOGLE_SCRIPT_URL"] ||
@@ -49,6 +49,12 @@ type SubmittedBooking = {
 
 function Book() {
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [now, setNow] = useState<Date | null>(null);
+  useEffect(() => {
+    setNow(new Date());
+    const timer = window.setInterval(() => setNow(new Date()), 1000);
+    return () => window.clearInterval(timer);
+  }, []);
   const [month, setMonth] = useState<number>(months[0]!.month);
   const [day, setDay] = useState<number | null>(null);
   const [time, setTime] = useState<string | null>(null);
@@ -66,17 +72,26 @@ function Book() {
     const errs: Record<string, string> = {};
     if (!r.success) r.error.issues.forEach((i) => (errs[String(i.path[0])] = i.message));
     if (!day || !time) errs["slot"] = "Please choose a date and time";
+    if (day && time && !canBook(month, day, time, new Date())) {
+      errs["slot"] = "Booking enquiries close four hours before the tour starts. Please choose a later tour.";
+    }
     setErrors(errs);
-    if (!r.success || !day || !time) return;
+    if (!r.success || !day || !time || errs["slot"]) return;
 
     const v = r.data;
     const marketingOptIn = new FormData(form).get("marketing") === "on";
     const monthLabel = months.find((m) => m.month === month)?.label ?? "";
     setSubmitting(true);
     try {
-      const { reference } = await saveBooking({
+      const result = await saveBooking({
         data: { month, day, time, guests, name: v.name, email: v.email, notes: v.notes || undefined },
       });
+      if (!result.reference) {
+        setErrors({ slot: result.error ?? "Please choose another tour." });
+        setNow(new Date());
+        return;
+      }
+      const reference = result.reference;
       if (!GOOGLE_SCRIPT_URL) {
         throw new Error("Google Script URL not configured");
       }
@@ -158,6 +173,7 @@ function Book() {
               <p className="eyebrow">Now booking · £{PRICE_PER_PERSON_GBP} per person</p>
               <h2 className="mt-2 text-2xl font-semibold">{tour.title}</h2>
               <p className="mt-2 text-sm text-muted-foreground">{tour.duration} · {tour.start} → {tour.end}</p>
+              <p className="mt-2 text-sm text-muted-foreground">Booking enquiries close four hours before each tour starts.</p>
 
               <h3 className="mt-8 font-sign text-sm uppercase tracking-widest">1. Choose a date</h3>
               {months.map((m) => (
@@ -165,7 +181,7 @@ function Book() {
                   <p className="text-sm font-semibold text-foreground">{m.label}</p>
                   <div className="mt-3 grid grid-cols-7 gap-2 sm:grid-cols-8">
                     {m.dates.map((d) => {
-                      const off = d.times.length === 0;
+                      const off = !now || !d.times.some((t) => canBook(d.month, d.day, t, now));
                       const isOn = d.month === month && d.day === day;
                       return (
                         <button
@@ -189,7 +205,7 @@ function Book() {
                   <h3 className="mt-6 font-sign text-sm uppercase tracking-widest">2. Choose a time</h3>
                   <div className="mt-3 flex gap-2">
                     {selected.times.map((t) => (
-                      <button key={t} type="button" onClick={() => setTime(t)} className={`rounded border px-5 py-2 ${t === time ? "border-primary bg-primary text-primary-foreground" : "border-border hover:border-primary"}`}>
+                      <button key={t} type="button" disabled={!now || !canBook(month, selected.day, t, now)} onClick={() => setTime(t)} className={`rounded border px-5 py-2 disabled:cursor-not-allowed disabled:opacity-50 disabled:line-through ${t === time ? "border-primary bg-primary text-primary-foreground" : "border-border hover:border-primary"}`}>
                         {formatTime(t)}
                       </button>
                     ))}
@@ -216,7 +232,7 @@ function Book() {
                 {errors["submit"] && <p className="text-sm text-destructive sm:col-span-2">{errors["submit"]}</p>}
                 <button
                   type="submit"
-                  disabled={submitting}
+                  disabled={submitting || !now || (!!day && !!time && !canBook(month, day, time, now))}
                   className="rounded bg-primary px-6 py-3 font-sign text-sm font-semibold uppercase tracking-widest text-primary-foreground hover:bg-primary/90 disabled:opacity-60 sm:col-span-2"
                 >
                   {submitting ? "Sending booking request…" : "Request booking"}

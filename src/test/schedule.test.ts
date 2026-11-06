@@ -1,7 +1,19 @@
 import { describe, expect, it } from "vitest";
-import { closedDaysNote, isoFor, timesForDay, tourDates, totalPrice } from "@/lib/schedule";
+import { canBook, closedDaysNote, isoFor, timesForDay, tourDates, totalPrice } from "@/lib/schedule";
 
 describe("Dickens tour schedule", () => {
+  it("closes enquiries exactly four hours before each London tour start", () => {
+    expect(canBook(11, 7, "19:00", new Date("2026-11-07T14:59:59.999Z"))).toBe(true);
+    expect(canBook(11, 7, "19:00", new Date("2026-11-07T15:00:00Z"))).toBe(false);
+    expect(canBook(11, 7, "19:00", new Date("2026-11-07T16:00:00Z"))).toBe(false);
+    expect(canBook(11, 7, "21:00", new Date("2026-11-07T16:00:00Z"))).toBe(true);
+    expect(canBook(11, 14, "20:00", new Date("2026-11-14T16:00:00Z"))).toBe(false);
+    expect(canBook(11, 14, "22:00", new Date("2026-11-14T17:59:59Z"))).toBe(true);
+    expect(canBook(12, 1, "19:00", new Date("2026-12-01T15:00:00Z"))).toBe(false);
+    expect(canBook(12, 1, "21:00", new Date("2026-12-01T17:00:00Z"))).toBe(false);
+    expect(canBook(12, 24, "19:00", new Date("2026-12-01T00:00:00Z"))).toBe(false);
+    expect(canBook(11, 7, "19:00", new Date("2026-11-08T00:00:00Z"))).toBe(false);
+  });
   it("runs 7pm and 9pm on normal November days from the 7th", () => {
     expect(timesForDay(11, 7)).toEqual(["19:00", "21:00"]);
   });
