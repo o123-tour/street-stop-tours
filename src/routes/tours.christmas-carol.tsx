@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PageHero } from "@/components/SiteHeader";
+import { Reviews } from "@/components/Reviews";
 import { faqs, images, tours } from "@/lib/content";
 import { PRICE_PER_PERSON_GBP } from "@/lib/schedule";
 
@@ -73,6 +74,8 @@ function TourPage() {
             The route is mostly flat, but some historic courts and alleys are narrow with uneven paving or cobbles.
             If you use a wheelchair or have limited mobility, please get in touch before booking and we'll talk through the route with you.
           </p>
+
+          <Reviews slug="christmas-carol" />
 
           <h2 className="mt-12 text-2xl font-semibold">Questions & answers</h2>
           <div className="mt-5 divide-y divide-border rounded border border-border">
