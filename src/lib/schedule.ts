@@ -48,6 +48,13 @@ export function isoFor(month: number, day: number): string {
   return `${m.year}-${String(m.month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
 }
 
+// November and December tour dates are in London standard time (UTC).
+export function canBook(month: number, day: number, time: string, now: Date): boolean {
+  if (!timesForDay(month, day).includes(time)) return false;
+  const start = new Date(`${isoFor(month, day)}T${time}:00Z`).getTime();
+  return now.getTime() < start - 4 * 60 * 60 * 1000;
+}
+
 export type TourDate = { iso: string; month: number; monthLabel: string; day: number; times: string[] };
 
 export function tourDates(): TourDate[] {
