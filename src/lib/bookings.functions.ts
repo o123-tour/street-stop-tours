@@ -1,11 +1,12 @@
 import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
-import { timesForDay } from "@/lib/schedule";
+import { isoFor, timesForDay } from "@/lib/schedule";
 import { canReview } from "@/lib/review-rules";
 
 const bookingSchema = z.object({
-  day: z.number().int().min(1).max(30),
+  month: z.number().int().min(11).max(12),
+  day: z.number().int().min(1).max(31),
   time: z.string().regex(/^\d\d:00$/),
   guests: z.number().int().min(1).max(20),
   name: z.string().trim().min(1).max(100),
@@ -23,13 +24,13 @@ function makeReference() {
 export const createBooking = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => bookingSchema.parse(d))
   .handler(async ({ data }) => {
-    if (!timesForDay(data.day).includes(data.time)) throw new Error("That tour time isn't available.");
+    if (!timesForDay(data.month, data.day).includes(data.time)) throw new Error("That tour time isn't available.");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const reference = makeReference();
     const { error } = await supabaseAdmin.from("bookings").insert({
       reference,
       tour_slug: "christmas-carol",
-      tour_date: `2026-11-${String(data.day).padStart(2, "0")}`,
+      tour_date: isoFor(data.month, data.day),
       tour_time: data.time,
       guests: data.guests,
       name: data.name,
