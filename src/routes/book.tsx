@@ -11,12 +11,6 @@ const GOOGLE_SCRIPT_URL =
   import.meta.env["VITE_GOOGLE_SCRIPT_URL"] ||
   "https://script.google.com/macros/s/AKfycbwyyLjvqsDpTwFCApM-ZiUS5S029d6jfzzPY0yXvk6vSUa3rt457yAB4NAEw-gnXx7U1g/exec";
 
-function makeReference() {
-  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-  let s = "SST-";
-  for (const b of crypto.getRandomValues(new Uint8Array(6))) s += chars[b % chars.length];
-  return s;
-}
 
 const schema = z.object({
   name: z.string().trim().min(1, "Please enter your name").max(100),
@@ -57,6 +51,7 @@ function Book() {
   const [guests, setGuests] = useState(2);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState<SubmittedBooking | null>(null);
+  const saveBooking = useServerFn(createBooking);
   const tour = tours[0]!;
   const selected = dates.find((d) => d.day === day);
 
@@ -72,9 +67,11 @@ function Book() {
 
     const v = r.data;
     const marketingOptIn = new FormData(form).get("marketing") === "on";
-    const reference = makeReference();
     setSubmitting(true);
     try {
+      const { reference } = await saveBooking({
+        data: { day, time, guests, name: v.name, email: v.email, notes: v.notes || undefined },
+      });
       if (!GOOGLE_SCRIPT_URL) {
         throw new Error("Google Script URL not configured");
       }
@@ -138,6 +135,7 @@ function Book() {
                   <dd className="mt-1 text-base">{tour.start} (arrive 10 mins early)</dd>
                 </div>
               </dl>
+              <p className="mt-4 text-sm text-muted-foreground">Keep your reference: you'll need it with your email to leave a review after the tour.</p>
               <button
                 type="button"
                 onClick={() => {
