@@ -92,7 +92,8 @@ function TourPage() {
             <div><dt className="eyebrow">Starts</dt><dd className="mt-1 text-base">{tour.start}</dd></div>
             <div><dt className="eyebrow">Ends</dt><dd className="mt-1 text-base">{tour.end}</dd></div>
             <div><dt className="eyebrow">Duration</dt><dd className="mt-1 text-base">{tour.duration}</dd></div>
-            <div><dt className="eyebrow">Times</dt><dd className="mt-1 text-base">7pm & 9pm nightly from 7 November</dd></div>
+            <div><dt className="eyebrow">Times</dt><dd className="mt-1 text-base">7pm &amp; 9pm nightly, 7 November – 31 December 2026</dd></div>
+            <div><dt className="eyebrow">No tours</dt><dd className="mt-1 text-base">28 November · 24, 25 &amp; 26 December</dd></div>
             <div><dt className="eyebrow">Price</dt><dd className="mt-1 text-base">£{PRICE_PER_PERSON_GBP} per person</dd></div>
           </dl>
           <Link to="/book" className="mt-6 block rounded bg-primary px-6 py-3 text-center font-sign text-sm font-semibold uppercase tracking-widest text-primary-foreground hover:bg-primary/90">Book this tour</Link>

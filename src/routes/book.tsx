@@ -5,7 +5,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { createBooking } from "@/lib/bookings.functions";
 import { PageHero } from "@/components/SiteHeader";
 import { images, tours } from "@/lib/content";
-import { formatTime, PRICE_PER_PERSON_GBP, totalPrice, tourDates } from "@/lib/schedule";
+import { formatTime, PRICE_PER_PERSON_GBP, totalPrice, tourMonths } from "@/lib/schedule";
 
 const GOOGLE_SCRIPT_URL =
   import.meta.env["VITE_GOOGLE_SCRIPT_URL"] ||
@@ -22,7 +22,7 @@ export const Route = createFileRoute("/book")({
   head: () => ({
     meta: [
       { title: "Book a Walking Tour | Street Stop Tours" },
-      { name: "description", content: "Book your place on A Christmas Carol: Dickens' London, a 90-minute walking tour of the City. £20 per person." },
+      { name: "description", content: "Book your place on A Christmas Carol: Dickens' London, a 90-minute walking tour of the City. £20 per person, nightly through November and December 2026." },
       { property: "og:title", content: "Book a Walking Tour | Street Stop Tours" },
       { property: "og:description", content: "Reserve your place on our 90-minute Dickens walking tour." },
       { property: "og:type", content: "website" },
@@ -33,10 +33,13 @@ export const Route = createFileRoute("/book")({
 });
 
 const field = "mt-2 w-full rounded border border-input bg-background px-4 py-3 text-foreground outline-none focus:border-ring";
-const dates = tourDates();
+const months = tourMonths();
+const allDates = months.flatMap((m) => m.dates);
 
 type SubmittedBooking = {
   reference: string;
+  month: number;
+  monthLabel: string;
   day: number;
   time: string;
   guests: number;
@@ -46,6 +49,7 @@ type SubmittedBooking = {
 
 function Book() {
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [month, setMonth] = useState<number>(months[0]!.month);
   const [day, setDay] = useState<number | null>(null);
   const [time, setTime] = useState<string | null>(null);
   const [guests, setGuests] = useState(2);
@@ -53,7 +57,7 @@ function Book() {
   const [submitted, setSubmitted] = useState<SubmittedBooking | null>(null);
   const saveBooking = useServerFn(createBooking);
   const tour = tours[0]!;
-  const selected = dates.find((d) => d.day === day);
+  const selected = allDates.find((d) => d.month === month && d.day === day);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -67,10 +71,11 @@ function Book() {
 
     const v = r.data;
     const marketingOptIn = new FormData(form).get("marketing") === "on";
+    const monthLabel = months.find((m) => m.month === month)?.label ?? "";
     setSubmitting(true);
     try {
       const { reference } = await saveBooking({
-        data: { day, time, guests, name: v.name, email: v.email, notes: v.notes || undefined },
+        data: { month, day, time, guests, name: v.name, email: v.email, notes: v.notes || undefined },
       });
       if (!GOOGLE_SCRIPT_URL) {
         throw new Error("Google Script URL not configured");
@@ -84,7 +89,7 @@ function Book() {
         body: JSON.stringify({
           reference,
           tour: tour.title,
-          date: `${day} November 2026`,
+          date: `${day} ${monthLabel}`,
           time: formatTime(time),
           name: v.name,
           email: v.email,
@@ -96,7 +101,7 @@ function Book() {
       });
       if (!response.ok) throw new Error("Failed to send booking request");
       form.reset();
-      setSubmitted({ reference, day, time, guests, name: v.name, email: v.email });
+      setSubmitted({ reference, month, monthLabel, day, time, guests, name: v.name, email: v.email });
     } catch {
       setErrors({ submit: "Could not send your booking request right now. Please try again in a moment." });
     } finally {
@@ -124,7 +129,7 @@ function Book() {
                 </div>
                 <div>
                   <dt className="eyebrow">Date & time</dt>
-                  <dd className="mt-1 text-base">{submitted.day} November 2026 at {formatTime(submitted.time)}</dd>
+                  <dd className="mt-1 text-base">{submitted.day} {submitted.monthLabel} at {formatTime(submitted.time)}</dd>
                 </div>
                 <div>
                   <dt className="eyebrow">Guests</dt>
@@ -154,24 +159,30 @@ function Book() {
               <h2 className="mt-2 text-2xl font-semibold">{tour.title}</h2>
               <p className="mt-2 text-sm text-muted-foreground">{tour.duration} · {tour.start} → {tour.end}</p>
 
-              <h3 className="mt-8 font-sign text-sm uppercase tracking-widest">1. Choose a date (November 2026)</h3>
-              <div className="mt-3 grid grid-cols-6 gap-2 sm:grid-cols-8">
-                {dates.map((d) => {
-                  const off = d.times.length === 0;
-                  return (
-                    <button
-                      key={d.day}
-                      type="button"
-                      disabled={off}
-                      onClick={() => { setDay(d.day); setTime(null); }}
-                      className={`rounded border px-2 py-2 text-sm ${off ? "cursor-not-allowed border-border text-muted-foreground line-through opacity-50" : d.day === day ? "border-primary bg-primary text-primary-foreground" : "border-border hover:border-primary"}`}
-                    >
-                      {d.day}
-                    </button>
-                  );
-                })}
-              </div>
-              <p className="mt-2 text-xs text-muted-foreground">No tours on 28 November.</p>
+              <h3 className="mt-8 font-sign text-sm uppercase tracking-widest">1. Choose a date</h3>
+              {months.map((m) => (
+                <div key={m.month} className="mt-6">
+                  <p className="text-sm font-semibold text-foreground">{m.label}</p>
+                  <div className="mt-3 grid grid-cols-7 gap-2 sm:grid-cols-8">
+                    {m.dates.map((d) => {
+                      const off = d.times.length === 0;
+                      const isOn = d.month === month && d.day === day;
+                      return (
+                        <button
+                          key={d.iso}
+                          type="button"
+                          disabled={off}
+                          onClick={() => { setMonth(m.month); setDay(d.day); setTime(null); }}
+                          className={`rounded border px-2 py-2 text-sm ${off ? "cursor-not-allowed border-border text-muted-foreground line-through opacity-50" : isOn ? "border-primary bg-primary text-primary-foreground" : "border-border hover:border-primary"}`}
+                        >
+                          {d.day}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  {m.closedNote && <p className="mt-2 text-xs text-muted-foreground">{m.closedNote}</p>}
+                </div>
+              ))}
 
               {selected && (
                 <>
