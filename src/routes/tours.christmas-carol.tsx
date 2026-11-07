@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PageHero } from "@/components/SiteHeader";
+import { Reviews } from "@/components/Reviews";
 import { faqs, images, tours } from "@/lib/content";
 import { PRICE_PER_PERSON_GBP } from "@/lib/schedule";
 
@@ -74,6 +75,8 @@ function TourPage() {
             If you use a wheelchair or have limited mobility, please get in touch before booking and we'll talk through the route with you.
           </p>
 
+          <Reviews slug="christmas-carol" />
+
           <h2 className="mt-12 text-2xl font-semibold">Questions & answers</h2>
           <div className="mt-5 divide-y divide-border rounded border border-border">
             {faqs.map((f) => (
@@ -89,7 +92,8 @@ function TourPage() {
             <div><dt className="eyebrow">Starts</dt><dd className="mt-1 text-base">{tour.start}</dd></div>
             <div><dt className="eyebrow">Ends</dt><dd className="mt-1 text-base">{tour.end}</dd></div>
             <div><dt className="eyebrow">Duration</dt><dd className="mt-1 text-base">{tour.duration}</dd></div>
-            <div><dt className="eyebrow">Times</dt><dd className="mt-1 text-base">7pm & 9pm nightly from 7 November</dd></div>
+            <div><dt className="eyebrow">Times</dt><dd className="mt-1 text-base">7pm &amp; 9pm nightly, 7 November – 31 December 2026</dd></div>
+            <div><dt className="eyebrow">No tours</dt><dd className="mt-1 text-base">28 November · 24, 25 &amp; 26 December</dd></div>
             <div><dt className="eyebrow">Price</dt><dd className="mt-1 text-base">£{PRICE_PER_PERSON_GBP} per person</dd></div>
           </dl>
           <Link to="/book" className="mt-6 block rounded bg-primary px-6 py-3 text-center font-sign text-sm font-semibold uppercase tracking-widest text-primary-foreground hover:bg-primary/90">Book this tour</Link>
