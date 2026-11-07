@@ -1,0 +1,39 @@
+{
+  "pages": [
+    {
+      "path": "/"
+    },
+    {
+      "path": "/book"
+    },
+    {
+      "path": "/tours/christmas-carol"
+    },
+    {
+      "path": "/blog"
+    },
+    {
+      "path": "/blog/history-of-st-pauls-cathedral"
+    },
+    {
+      "path": "/?404",
+      "prerender": {
+        "outputPath": "/404",
+        "crawlLinks": false,
+        "retryCount": 0,
+        "enabled": true,
+        "headers": {
+          "X-TSS_SHELL": "true"
+        }
+      },
+      "sitemap": {
+        "exclude": true
+      }
+    },
+    {
+      "path": "/blog/"
+    }
+  ],
+  "host": "https://streetstoptours.com",
+  "lastBuilt": "2026-11-07T12:36:51.563Z"
+}
