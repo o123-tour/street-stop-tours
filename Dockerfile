@@ -14,7 +14,7 @@ ENV NODE_ENV=production
 ENV PORT=8080
 
 COPY --from=builder /app/dist/client ./dist/client
-COPY --from=builder /app/server.mjs ./server.mjs
+COPY --from=builder /app/cloud-server.mjs ./cloud-server.mjs
 
 EXPOSE 8080
-CMD ["node", "server.mjs"]
+CMD ["node", "cloud-server.mjs"]
