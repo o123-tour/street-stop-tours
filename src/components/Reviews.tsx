@@ -38,10 +38,14 @@ export function Reviews({ slug }: { slug: string }) {
     e.preventDefault();
     const form = e.currentTarget;
     const f = new FormData(form);
-    const reference = String(f.get("reference") ?? "").trim().toUpperCase();
+    const name = String(f.get("name") ?? "").trim();
     const email = String(f.get("email") ?? "").trim().toLowerCase();
     const comment = String(f.get("comment") ?? "").trim();
 
+    if (!name) {
+      setMsg({ ok: false, text: "Please enter your name." });
+      return;
+    }
     if (comment.length < 5) {
       setMsg({ ok: false, text: "Please check your details: comments need at least 5 characters." });
       return;
@@ -58,7 +62,7 @@ export function Reviews({ slug }: { slug: string }) {
         body: JSON.stringify({
           action: "submitReview",
           slug,
-          reference,
+          name,
           email,
           rating,
           comment,
@@ -71,7 +75,8 @@ export function Reviews({ slug }: { slug: string }) {
       } else {
         setMsg({ ok: true, text: "Thank you! Your review is now live." });
         form.reset();
-        qc.invalidateQueries({ queryKey: ["reviews", slug] });
+        setRating(5);
+        await qc.invalidateQueries({ queryKey: ["reviews", slug] });
       }
     } catch {
       setMsg({ ok: false, text: "Could not submit your review right now. Please try again in a moment." });
@@ -107,14 +112,14 @@ export function Reviews({ slug }: { slug: string }) {
         ))}
       </div>
       <form onSubmit={onSubmit} className="mt-8 grid gap-4 rounded border border-border p-5 sm:grid-cols-2">
-        <p className="text-sm text-muted-foreground sm:col-span-2">Been on the tour? Enter your booking reference and email to leave a review.</p>
+        <p className="text-sm text-muted-foreground sm:col-span-2">Been on the tour? Leave a review below.</p>
         <label className="text-sm">
-          Booking reference
-          <input name="reference" required placeholder="SST-XXXXXX" className={field} />
+          Your name
+          <input name="name" required maxLength={100} placeholder="e.g. Sarah M." className={field} />
         </label>
         <label className="text-sm">
-          Email used to book
-          <input name="email" type="email" required className={field} />
+          Your email (not shown publicly)
+          <input name="email" type="email" required maxLength={255} className={field} />
         </label>
         <div className="text-sm sm:col-span-2">
           Rating
